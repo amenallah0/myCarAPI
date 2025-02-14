@@ -1,0 +1,111 @@
+.
+├── directory_tree.txt
+├── HELP.md
+├── mvnw
+├── mvnw.cmd
+├── pom.xml
+├── README.md
+├── src
+│   ├── main
+│   │   ├── java
+│   │   │   ├── com
+│   │   │   │   └── myCar
+│   │   │   │       ├── config
+│   │   │   │       │   ├── CorsConfig.java
+│   │   │   │       │   ├── JacksonConfig.java
+│   │   │   │       │   └── SecurityConfig.java
+│   │   │   │       ├── controller
+│   │   │   │       │   ├── CarController.java
+│   │   │   │       │   ├── FileUploadController.java
+│   │   │   │       │   └── UserController.java
+│   │   │   │       ├── CustomMySQLDialect.java
+│   │   │   │       ├── domain
+│   │   │   │       │   ├── Car.java
+│   │   │   │       │   ├── Role.java
+│   │   │   │       │   └── User.java
+│   │   │   │       ├── MyCarApiApplication.java
+│   │   │   │       ├── repository
+│   │   │   │       │   ├── CarRepository.java
+│   │   │   │       │   └── UserRepository.java
+│   │   │   │       ├── service
+│   │   │   │       │   ├── CarService.java
+│   │   │   │       │   ├── FileUploadService.java
+│   │   │   │       │   └── UserService.java
+│   │   │   │       ├── upload
+│   │   │   │       └── usecase
+│   │   │   │           ├── CarUseCase.java
+│   │   │   │           ├── FileUploadUseCase.java
+│   │   │   │           └── UserUseCase.java
+│   │   │   └── tree_output.txt
+│   │   └── resources
+│   │       └── application.properties
+│   └── test
+│       ├── java
+│       │   └── com
+│       │       └── myCar
+│       │           ├── controller
+│       │           │   ├── CarControllerTest.java
+│       │           │   └── UserControllerTest.java
+│       │           ├── MyCarApiApplicationTests.java
+│       │           └── service
+│       │               ├── CarServiceTest.java
+│       │               └── UserServiceTest.java
+│       └── resources
+├── target
+│   ├── classes
+│   │   ├── application.properties
+│   │   ├── com
+│   │   │   └── myCar
+│   │   │       ├── config
+│   │   │       │   ├── CorsConfig.class
+│   │   │       │   ├── JacksonConfig.class
+│   │   │       │   └── SecurityConfig.class
+│   │   │       ├── controller
+│   │   │       │   ├── CarController.class
+│   │   │       │   ├── FileUploadController.class
+│   │   │       │   └── UserController.class
+│   │   │       ├── CustomMySQLDialect.class
+│   │   │       ├── domain
+│   │   │       │   ├── Car$CarBuilder.class
+│   │   │       │   ├── Car.class
+│   │   │       │   ├── Role.class
+│   │   │       │   └── User.class
+│   │   │       ├── MyCarApiApplication.class
+│   │   │       ├── repository
+│   │   │       │   ├── CarRepository.class
+│   │   │       │   └── UserRepository.class
+│   │   │       ├── service
+│   │   │       │   ├── CarService.class
+│   │   │       │   ├── FileUploadService.class
+│   │   │       │   └── UserService.class
+│   │   │       ├── upload
+│   │   │       └── usecase
+│   │   │           ├── CarUseCase.class
+│   │   │           ├── FileUploadUseCase.class
+│   │   │           └── UserUseCase.class
+│   │   ├── META-INF
+│   │   │   ├── MANIFEST.MF
+│   │   │   └── maven
+│   │   │       └── com.myCar
+│   │   │           └── myCarApi
+│   │   │               ├── pom.properties
+│   │   │               └── pom.xml
+│   │   └── tree_output.txt
+│   ├── generated-sources
+│   │   └── annotations
+│   ├── generated-test-sources
+│   │   └── test-annotations
+│   └── test-classes
+│       └── com
+│           └── myCar
+│               ├── controller
+│               │   ├── CarControllerTest.class
+│               │   └── UserControllerTest.class
+│               ├── MyCarApiApplicationTests.class
+│               └── service
+│                   ├── CarServiceTest.class
+│                   └── UserServiceTest.class
+├── tree.md
+└── uploads
+
+45 directories, 63 files
