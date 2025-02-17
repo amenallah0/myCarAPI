@@ -59,9 +59,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/files/**").permitAll() // Permit access to these endpoints without authentication
                 .antMatchers("/api/experts/**").permitAll() // Ajout de la sécurité pour les routes expert
                 .antMatchers("/api/users/admin/signup").permitAll()     // Permettre l'accès à l'inscription admin
-                .antMatchers("/api/expert-requests/**").permitAll() // Ajout de la sécurité pour les routes expert
+                .antMatchers("/api/admin/expert-requests/**").hasRole("ADMIN") // Restrict to admin only
+                .antMatchers("/api/expert-requests/**").permitAll()
                 .antMatchers("/api/admin/**").permitAll() // Ajout de la sécurité pour les routes admin
-                .antMatchers("/api/admin/expert-requests/**").permitAll() // Ajout de la sécurité pour les routes admin
                 .antMatchers("/api/admin/experts/**").permitAll() // Ajout de la sécurité pour les routes admin
                 .antMatchers("/api/admin/cars/**").permitAll() // Ajout de la sécurité pour les routes admin
                 .antMatchers("/api/admin/sales/**").permitAll() // Ajout de la sécurité pour les routes admin
