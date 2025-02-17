@@ -43,12 +43,7 @@ public class ExpertRequest {
     
     @PrePersist
     protected void onCreate() {
-        if (createdAt == null) {
-            createdAt = LocalDateTime.now();
-        }
-        if (status == null) {
-            status = RequestStatus.PENDING;
-        }
+        createdAt = LocalDateTime.now();
     }
 
     public enum RequestStatus {
