@@ -68,7 +68,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/admin/users/**").permitAll() // Ajout de la sécurité pour les routes admin
                 .antMatchers(HttpMethod.POST, "/api/annonces").permitAll() // Autoriser uniquement les admins à créer des annonces
                 .antMatchers(HttpMethod.GET, "/api/annonces").permitAll() // Autoriser uniquement les admins à créer des annonces
-                
+                .antMatchers(HttpMethod.DELETE, "/api/annonces/{id}").permitAll() // Autoriser uniquement les admins à créer des annonces
+                .antMatchers(HttpMethod.PUT, "/api/annonces/{id}").permitAll() // Autoriser uniquement les admins à créer des annonces
                 .anyRequest().authenticated()
             .and()
             .sessionManagement()
