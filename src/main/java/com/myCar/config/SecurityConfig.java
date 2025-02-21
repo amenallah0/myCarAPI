@@ -66,6 +66,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/admin/cars/**").permitAll() // Ajout de la sécurité pour les routes admin
                 .antMatchers("/api/admin/sales/**").permitAll() // Ajout de la sécurité pour les routes admin
                 .antMatchers("/api/admin/users/**").permitAll() // Ajout de la sécurité pour les routes admin
+                .antMatchers(HttpMethod.POST, "/api/annonces").permitAll() // Autoriser uniquement les admins à créer des annonces
+                .antMatchers(HttpMethod.GET, "/api/annonces").permitAll() // Autoriser uniquement les admins à créer des annonces
+                
                 .anyRequest().authenticated()
             .and()
             .sessionManagement()
@@ -75,7 +78,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // Ajustez selon votre frontend
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // Remplacez par l'URL de votre frontend
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
