@@ -93,4 +93,9 @@ public class ExpertRequestService {
             })
             .collect(Collectors.toList());
     }
+
+    public void deleteRequestsByUserId(Long userId) {
+        List<ExpertRequest> requests = expertRequestRepository.findByUserId(userId);
+        expertRequestRepository.deleteAll(requests);
+    }
 } 
