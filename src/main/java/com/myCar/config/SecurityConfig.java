@@ -70,6 +70,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/api/annonces").permitAll() // Autoriser uniquement les admins à créer des annonces
                 .antMatchers(HttpMethod.DELETE, "/api/annonces/{id}").permitAll() // Autoriser uniquement les admins à créer des annonces
                 .antMatchers(HttpMethod.PUT, "/api/annonces/{id}").permitAll() // Autoriser uniquement les admins à créer des annonces
+                .antMatchers("/api/expertise-requests/**").permitAll()
                 .anyRequest().authenticated()
             .and()
             .sessionManagement()
