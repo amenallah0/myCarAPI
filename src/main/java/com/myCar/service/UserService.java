@@ -2,6 +2,8 @@ package com.myCar.service;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -9,9 +11,12 @@ import org.springframework.stereotype.Service;
 import com.myCar.domain.User;
 import com.myCar.repository.UserRepository;
 import com.myCar.usecase.UserUseCase;
+import com.myCar.domain.Role;
 
 @Service
 public class UserService implements UserUseCase {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder; // Inject PasswordEncoder bean here
@@ -73,5 +78,19 @@ public class UserService implements UserUseCase {
         }).orElse(null);
     }
     
-
+    public List<User> findAllByRole(String roleStr) {
+        try {
+            logger.info("Finding users with role: {}", roleStr);
+            Role role = Role.valueOf(roleStr.toUpperCase());
+            List<User> users = userRepository.findByRole(role);
+            logger.info("Found {} users with role {}", users.size(), role);
+            return users;
+        } catch (IllegalArgumentException e) {
+            logger.error("Invalid role: {}", roleStr, e);
+            throw new IllegalArgumentException("Invalid role: " + roleStr);
+        } catch (Exception e) {
+            logger.error("Error finding users by role: {}", roleStr, e);
+            throw new RuntimeException("Error finding users by role: " + e.getMessage());
+        }
+    }
 }
