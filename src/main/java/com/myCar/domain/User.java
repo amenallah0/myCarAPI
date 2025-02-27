@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
+import javax.persistence.Column;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -30,9 +31,15 @@ public class User {
 
     private String username;
 
+    @Column(unique = true, updatable = false)
     private String email;
 
     private String password;
+
+    private String firstName;
+    private String lastName;
+    private String phone;
+    private String address;
 
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -48,15 +55,26 @@ public class User {
         // Default constructor
     }
 
-    public User(String username, String email, String password, Role role) {
+    public User(String username, String email, String password, Role role, 
+                String firstName, String lastName, String phone, String address) {
         this.username = username;
         this.email = email;
         setPassword(password);
-        this.role = role != null ? role : Role.USER; // Set default role if none provided
+        this.role = role != null ? role : Role.USER;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phone = phone;
+        this.address = address;
     }
 
+    // Constructeur minimal
     public User(String username, String email, String password) {
-        this(username, email, password, Role.USER); // Default constructor uses USER role
+        this(username, email, password, Role.USER, null, null, null, null);
+    }
+
+    // Constructeur avec role
+    public User(String username, String email, String password, Role role) {
+        this(username, email, password, role, null, null, null, null);
     }
 
     @PrePersist
@@ -64,7 +82,7 @@ public class User {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
         if (role == null) {
-            role = Role.USER; // Ensure default role is set
+            role = Role.USER;
         }
     }
 

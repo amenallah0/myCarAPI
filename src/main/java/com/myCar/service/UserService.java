@@ -69,10 +69,20 @@ public class UserService implements UserUseCase {
     }
     public User updateUser(Long id, User updatedUser) {
         return userRepository.findById(id).map(user -> {
-            user.setUsername(updatedUser.getUsername());
-            user.setEmail(updatedUser.getEmail());
-            if (updatedUser.getPassword() != null) {
-                user.setPassword(updatedUser.getPassword());
+            if (updatedUser.getUsername() != null) {
+                user.setUsername(updatedUser.getUsername());
+            }
+            if (updatedUser.getFirstName() != null) {
+                user.setFirstName(updatedUser.getFirstName());
+            }
+            if (updatedUser.getLastName() != null) {
+                user.setLastName(updatedUser.getLastName());
+            }
+            if (updatedUser.getPhone() != null) {
+                user.setPhone(updatedUser.getPhone());
+            }
+            if (updatedUser.getAddress() != null) {
+                user.setAddress(updatedUser.getAddress());
             }
             return userRepository.save(user);
         }).orElse(null);
