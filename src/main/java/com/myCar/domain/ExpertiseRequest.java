@@ -34,10 +34,14 @@ public class ExpertiseRequest {
     @Enumerated(EnumType.STRING)
     private RequestStatus status = RequestStatus.PENDING;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    private ExpertReport report;
+
     public enum RequestStatus {
-        PENDING,
-        ACCEPTED,
-        REJECTED
+        PENDING,    // En attente
+        ACCEPTED,   // Acceptée
+        REJECTED,   // Rejetée
+        COMPLETED   // Rapport soumis
     }
 
     @PrePersist

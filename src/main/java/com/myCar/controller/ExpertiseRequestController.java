@@ -1,11 +1,18 @@
 package com.myCar.controller;
 
+import com.myCar.domain.ExpertReport;
 import com.myCar.domain.ExpertiseRequest;
+import com.myCar.dto.ExpertReportDTO;
 import com.myCar.service.ExpertiseRequestService;
+import com.myCar.service.ExpertService;
+import com.myCar.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -15,6 +22,9 @@ public class ExpertiseRequestController {
 
     @Autowired
     private ExpertiseRequestService expertiseRequestService;
+
+    @Autowired
+    private ExpertService expertService;
 
     @PostMapping
     public ResponseEntity<ExpertiseRequest> createRequest(@RequestBody CreateExpertiseRequestDTO requestDTO) {
@@ -49,6 +59,43 @@ public class ExpertiseRequestController {
     public ResponseEntity<ExpertiseRequest> rejectRequest(@PathVariable Long requestId) {
         ExpertiseRequest request = expertiseRequestService.rejectRequest(requestId);
         return ResponseEntity.ok(request);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ExpertiseRequest> getExpertiseRequest(@PathVariable Long id) {
+        try {
+            ExpertiseRequest request = expertiseRequestService.getExpertiseRequestById(id);
+            return ResponseEntity.ok(request);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping(value = "/{requestId}/submit-report", 
+                consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> submitExpertReport(
+            @PathVariable Long requestId,
+            @ModelAttribute ExpertReportDTO reportDTO) {
+        try {
+            if (reportDTO.getExpertiseDate() == null) {
+                reportDTO.setExpertiseDate(LocalDate.now());
+            }
+            
+            ExpertReport report = expertService.submitReport(requestId, reportDTO);
+            return ResponseEntity.ok(report);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/{id}/download-file")
+    public ResponseEntity<byte[]> downloadFile(@PathVariable Long id) {
+        ExpertReport report = expertiseRequestService.getReportById(id);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + report.getFileName() + "\"")
+                .contentType(MediaType.parseMediaType(report.getFileType()))
+                .body(report.getFileData());
     }
 }
 

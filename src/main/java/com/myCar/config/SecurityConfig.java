@@ -71,6 +71,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.DELETE, "/api/annonces/{id}").permitAll() // Autoriser uniquement les admins à créer des annonces
                 .antMatchers(HttpMethod.PUT, "/api/annonces/{id}").permitAll() // Autoriser uniquement les admins à créer des annonces
                 .antMatchers("/api/expertise-requests/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/experts/expertise-requests/*/submit-report")
+                .hasRole("EXPERT")
                 .anyRequest().authenticated()
             .and()
             .sessionManagement()

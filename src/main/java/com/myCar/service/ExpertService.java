@@ -5,8 +5,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.myCar.domain.Expert;
+import com.myCar.domain.ExpertReport;
+import com.myCar.dto.ExpertReportDTO;
 import com.myCar.repository.ExpertRepository;
+import com.myCar.repository.ExpertReportRepository;
 import com.myCar.exception.ResourceNotFoundException;
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -14,10 +18,12 @@ import java.util.List;
 public class ExpertService {
     
     private final ExpertRepository expertRepository;
+    private final ExpertReportRepository expertReportRepository;
     
     @Autowired
-    public ExpertService(ExpertRepository expertRepository) {
+    public ExpertService(ExpertRepository expertRepository, ExpertReportRepository expertReportRepository) {
         this.expertRepository = expertRepository;
+        this.expertReportRepository = expertReportRepository;
     }
     
     public Expert createExpert(Expert expert) {
@@ -54,5 +60,26 @@ public class ExpertService {
     
     public List<Expert> getExpertsBySpecialite(String specialite) {
         return expertRepository.findBySpecialite(specialite);
+    }
+    
+    public ExpertReport submitReport(Long requestId, ExpertReportDTO reportDTO) throws IOException {
+        // Créer un nouveau rapport
+        ExpertReport report = new ExpertReport();
+        report.setTitle(reportDTO.getTitle());
+        report.setCriticalData(reportDTO.getCriticalData());
+        report.setExpertiseDate(reportDTO.getExpertiseDate());
+        report.setMessage(reportDTO.getMessage());
+        report.setExpertName(reportDTO.getExpertName());
+        report.setExpertEmail(reportDTO.getExpertEmail());
+        report.setExpertPhone(reportDTO.getExpertPhone());
+        
+        // Gestion du fichier
+        if (reportDTO.getFile() != null && !reportDTO.getFile().isEmpty()) {
+            report.setFileName(reportDTO.getFile().getOriginalFilename());
+            report.setFileType(reportDTO.getFile().getContentType());
+            report.setFileData(reportDTO.getFile().getBytes());
+        }
+        
+        return expertReportRepository.save(report);
     }
 } 
