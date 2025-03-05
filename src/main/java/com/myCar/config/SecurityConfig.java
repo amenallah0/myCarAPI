@@ -75,7 +75,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .hasRole("EXPERT")
                 .antMatchers(HttpMethod.POST, "/api/notifications").permitAll() // Autoriser uniquement les admins
                 .antMatchers(HttpMethod.GET, "/api/notifications").permitAll() // Autoriser uniquement les admins
-                .antMatchers(HttpMethod.DELETE, "/api/notifications").permitAll() // Autoriser uniquement les admins
+                .antMatchers(HttpMethod.DELETE, "/api/notifications/**").permitAll() // Autoriser uniquement les admins
                 .anyRequest().authenticated()
             .and()
             .sessionManagement()
