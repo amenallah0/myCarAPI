@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -108,5 +109,23 @@ public class ExpertiseRequestService {
         }
         
         return request.getReport();
+    }
+
+    public void promoteAnnonce(Long annonceId) {
+        // Récupérer l'annonce (car) par son ID
+        Car car = carRepository.findById(annonceId)
+            .orElseThrow(() -> new ResourceNotFoundException("Annonce not found with id: " + annonceId));
+
+        // Mettre à jour le statut de promotion
+        car.setPromoted(true);
+        
+        // Définir la date de début de promotion
+        car.setPromotionStartDate(LocalDateTime.now());
+        
+        // Définir la date de fin de promotion (par exemple, 7 jours)
+        car.setPromotionEndDate(LocalDateTime.now().plusDays(7));
+
+        // Sauvegarder les modifications
+        carRepository.save(car);
     }
 } 

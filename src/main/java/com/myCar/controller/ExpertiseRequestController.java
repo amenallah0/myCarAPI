@@ -8,6 +8,7 @@ import com.myCar.service.ExpertService;
 import com.myCar.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -96,6 +97,18 @@ public class ExpertiseRequestController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + report.getFileName() + "\"")
                 .contentType(MediaType.parseMediaType(report.getFileType()))
                 .body(report.getFileData());
+    }
+
+    @PostMapping("/promote/{annonceId}")
+    public ResponseEntity<?> promoteAnnonce(@PathVariable Long annonceId) {
+        try {
+            // Mettre à jour le statut de promotion de l'annonce
+            expertiseRequestService.promoteAnnonce(annonceId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Erreur lors de la promotion de l'annonce");
+        }
     }
 }
 

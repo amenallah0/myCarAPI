@@ -68,6 +68,15 @@ public class Car {
     @JsonIgnoreProperties("car") // Ignore car reference in images during serialization
     private List<Image> images;
 
+    @Column(nullable = false)
+    private boolean promoted = false;
+
+    @Column
+    private LocalDateTime promotionStartDate;
+
+    @Column
+    private LocalDateTime promotionEndDate;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
@@ -77,5 +86,29 @@ public class Car {
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
+    }
+
+    public boolean isPromoted() {
+        return promoted;
+    }
+
+    public void setPromoted(boolean promoted) {
+        this.promoted = promoted;
+    }
+
+    public LocalDateTime getPromotionStartDate() {
+        return promotionStartDate;
+    }
+
+    public void setPromotionStartDate(LocalDateTime promotionStartDate) {
+        this.promotionStartDate = promotionStartDate;
+    }
+
+    public LocalDateTime getPromotionEndDate() {
+        return promotionEndDate;
+    }
+
+    public void setPromotionEndDate(LocalDateTime promotionEndDate) {
+        this.promotionEndDate = promotionEndDate;
     }
 }

@@ -76,6 +76,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/api/notifications").permitAll() // Autoriser uniquement les admins
                 .antMatchers(HttpMethod.GET, "/api/notifications").permitAll() // Autoriser uniquement les admins
                 .antMatchers(HttpMethod.DELETE, "/api/notifications/**").permitAll() // Autoriser uniquement les admins
+                .antMatchers(HttpMethod.POST, "/api/payments/generate-link").permitAll() // Autoriser uniquement les admins
+                .antMatchers("/api/payments/**").permitAll() // Ajouter cette ligne
+
                 .anyRequest().authenticated()
             .and()
             .sessionManagement()
