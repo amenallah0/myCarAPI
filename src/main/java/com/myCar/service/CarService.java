@@ -78,6 +78,18 @@ public class CarService {
         return carRepository.findAll(pageable).getContent();
     }
 
+    public Car updatePromotionStatus(Long id, boolean promoted) {
+        System.out.println("Service: Updating car " + id + " promotion status to " + promoted); // Log pour debug
+        Car car = carRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Car not found with id: " + id));
+        car.setPromoted(promoted);
+        Car savedCar = carRepository.save(car);
+        System.out.println("Service: Car saved with promotion status: " + savedCar.isPromoted()); // Log pour debug
+        return savedCar;
+    }
 
+    public List<Car> getPromotedCars() {
+        return carRepository.findByPromotedTrue();
+    }
 
 }

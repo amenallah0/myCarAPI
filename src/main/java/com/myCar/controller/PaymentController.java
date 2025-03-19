@@ -20,8 +20,10 @@ public class PaymentController {
         try {
             int amount = Integer.parseInt(request.get("amount").toString());
             String trackingId = request.get("trackingId").toString();
+            String successUrl = request.get("successUrl").toString();
+            String failUrl = request.get("failUrl").toString();
             
-            Map<String, Object> response = flouciService.generatePaymentLink(amount, trackingId);
+            Map<String, Object> response = flouciService.generatePaymentLink(amount, trackingId, successUrl, failUrl);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error generating payment link: " + e.getMessage());

@@ -10,5 +10,5 @@ import com.myCar.domain.Car;
 
 public interface CarRepository extends JpaRepository<Car, Long> {
     Page<Car> findAll(Pageable pageable);
-
+    List<Car> findByPromotedTrue();
 }

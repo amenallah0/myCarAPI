@@ -80,4 +80,24 @@ public class CarController {
         return ResponseEntity.ok(cars);
     }
     
+    @PutMapping("/{id}/promote")
+    @CrossOrigin(origins = "*")
+    public ResponseEntity<Car> updatePromotionStatus(
+            @PathVariable Long id,
+            @RequestParam boolean promoted) {
+        try {
+            System.out.println("Updating promotion status for car " + id + " to " + promoted);
+            Car updatedCar = carService.updatePromotionStatus(id, promoted);
+            return ResponseEntity.ok(updatedCar);
+        } catch (Exception e) {
+            System.err.println("Error updating promotion status: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/promoted")
+    public ResponseEntity<List<Car>> getPromotedCars() {
+        List<Car> cars = carService.getPromotedCars();
+        return ResponseEntity.ok(cars);
+    }
 }
