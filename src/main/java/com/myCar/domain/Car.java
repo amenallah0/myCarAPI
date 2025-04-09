@@ -77,6 +77,9 @@ public class Car {
     @Column
     private LocalDateTime promotionEndDate;
 
+    @Column(nullable = false)
+    private boolean available = true;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
@@ -110,5 +113,13 @@ public class Car {
 
     public void setPromotionEndDate(LocalDateTime promotionEndDate) {
         this.promotionEndDate = promotionEndDate;
+    }
+
+    public boolean isAvailable() {
+        return available;
+    }
+
+    public void setAvailable(boolean available) {
+        this.available = available;
     }
 }

@@ -100,4 +100,14 @@ public class CarController {
         List<Car> cars = carService.getPromotedCars();
         return ResponseEntity.ok(cars);
     }
+
+    @PutMapping("/{id}/availability")
+    public ResponseEntity<Car> updateAvailability(@PathVariable Long id, @RequestParam boolean available) {
+        try {
+            Car updatedCar = carService.updateAvailability(id, available);
+            return ResponseEntity.ok(updatedCar);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }

@@ -92,4 +92,11 @@ public class CarService {
         return carRepository.findByPromotedTrue();
     }
 
+    public Car updateAvailability(Long id, boolean available) {
+        Car car = carRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Car not found"));
+        car.setAvailable(available);
+        return carRepository.save(car);
+    }
+
 }

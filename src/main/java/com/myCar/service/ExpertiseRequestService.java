@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ExpertiseRequestService {
@@ -127,5 +128,13 @@ public class ExpertiseRequestService {
 
         // Sauvegarder les modifications
         carRepository.save(car);
+    }
+
+    public List<ExpertReport> getReportsByUserId(Long userId) {
+        List<ExpertiseRequest> requests = expertiseRequestRepository.findByUserId(userId);
+        return requests.stream()
+            .filter(request -> request.getReport() != null)
+            .map(ExpertiseRequest::getReport)
+            .collect(Collectors.toList());
     }
 } 
