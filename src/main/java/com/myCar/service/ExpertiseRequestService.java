@@ -12,6 +12,7 @@ import com.myCar.exception.ResourceNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -49,8 +50,43 @@ public class ExpertiseRequestService {
         return expertiseRequestRepository.save(request);
     }
 
+    @Transactional(readOnly = true)
     public List<ExpertiseRequest> getRequestsByExpertId(Long expertId) {
-        return expertiseRequestRepository.findByExpertId(expertId);
+        try {
+            // Vérifier si l'expert existe
+            User expert = userRepository.findById(expertId)
+                .orElseThrow(() -> new ResourceNotFoundException("Expert non trouvé avec l'id : " + expertId));
+                
+            List<ExpertiseRequest> requests = expertiseRequestRepository.findByExpertId(expertId);
+            
+            // Initialiser les collections lazy de manière sécurisée
+            requests.forEach(request -> {
+                try {
+                    if (request.getCar() != null) {
+                        request.getCar().getId();
+                    }
+                    if (request.getUser() != null) {
+                        request.getUser().getId();
+                    }
+                    if (request.getExpert() != null) {
+                        request.getExpert().getId();
+                    }
+                    if (request.getReport() != null) {
+                        request.getReport().getId();
+                    }
+                } catch (Exception e) {
+                    // Log l'erreur mais continuer avec les autres requêtes
+                    e.printStackTrace();
+                }
+            });
+            
+            return requests;
+        } catch (ResourceNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Erreur lors du chargement des expertises: " + e.getMessage(), e);
+        }
     }
 
     public List<ExpertiseRequest> getRequestsByUserId(Long userId) {

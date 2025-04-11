@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import lombok.Data;
+import lombok.AllArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -39,9 +41,20 @@ public class ExpertiseRequestController {
     }
 
     @GetMapping("/expert/{expertId}")
-    public ResponseEntity<List<ExpertiseRequest>> getExpertRequests(@PathVariable Long expertId) {
-        List<ExpertiseRequest> requests = expertiseRequestService.getRequestsByExpertId(expertId);
-        return ResponseEntity.ok(requests);
+    public ResponseEntity<?> getExpertRequests(@PathVariable Long expertId) {
+        try {
+            List<ExpertiseRequest> requests = expertiseRequestService.getRequestsByExpertId(expertId);
+            return ResponseEntity.ok(requests);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse("Expert non trouvé", e.getMessage()));
+        } catch (Exception e) {
+            e.printStackTrace(); // Log the full stack trace
+            return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse("Erreur lors du chargement des expertises", e.getMessage()));
+        }
     }
 
     @GetMapping("/user/{userId}")
@@ -73,7 +86,8 @@ public class ExpertiseRequestController {
     }
 
     @PostMapping(value = "/{requestId}/submit-report", 
-                consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+                consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+                produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> submitExpertReport(
             @PathVariable Long requestId,
             @ModelAttribute ExpertReportDTO reportDTO) {
@@ -83,10 +97,14 @@ public class ExpertiseRequestController {
             }
             
             ExpertReport report = expertService.submitReport(requestId, reportDTO);
-            return ResponseEntity.ok(report);
+            return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(report);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ErrorResponse(e.getMessage(), null));
         }
     }
 
@@ -109,6 +127,42 @@ public class ExpertiseRequestController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("Erreur lors de la promotion de l'annonce");
         }
+    }
+
+    @GetMapping("/{requestId}/report/download")
+    public ResponseEntity<?> downloadReport(@PathVariable Long requestId) {
+        try {
+            ExpertReport report = expertService.getReportByRequestId(requestId);
+            
+            if (report == null || report.getFileData() == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            // Vérifier le type de fichier
+            String contentType = report.getFileType() != null ? 
+                report.getFileType() : MediaType.APPLICATION_PDF_VALUE;
+
+            return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .contentLength(report.getFileData().length)
+                .header(HttpHeaders.CONTENT_DISPOSITION, 
+                    "attachment; filename=\"" + (report.getFileName() != null ? 
+                    report.getFileName() : "rapport-" + requestId + ".pdf") + "\"")
+                .body(report.getFileData());
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            e.printStackTrace(); // Pour le débogage
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse("Erreur lors du téléchargement du rapport", e.getMessage()));
+        }
+    }
+
+    @Data
+    @AllArgsConstructor
+    static class ErrorResponse {
+        private String message;
+        private String details;
     }
 }
 

@@ -59,17 +59,9 @@ public class ExpertController {
         return ResponseEntity.ok(experts);
     }
     
-    @PostMapping(value = "/expertise-requests/{requestId}/submit-report", 
-                consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> submitExpertReport(
-            @PathVariable Long requestId,
-            @ModelAttribute ExpertReportDTO reportDTO) {
+    @PostMapping("/expertise-requests/{requestId}/submit-report")
+    public ResponseEntity<?> submitExpertReport(@PathVariable Long requestId, @ModelAttribute ExpertReportDTO reportDTO) {
         try {
-            // Conversion de la date si nécessaire
-            if (reportDTO.getExpertiseDate() == null) {
-                reportDTO.setExpertiseDate(LocalDate.now());
-            }
-            
             ExpertReport report = expertService.submitReport(requestId, reportDTO);
             return ResponseEntity.ok(report);
         } catch (Exception e) {

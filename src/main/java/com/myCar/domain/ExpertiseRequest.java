@@ -3,6 +3,7 @@ package com.myCar.domain;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -11,21 +12,26 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "expertise_request")
 public class ExpertiseRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(unique = true, nullable = false)
     private Long id;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnoreProperties({"cars", "password", "createdAt", "updatedAt"})
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "expert_id")
+    @JsonIgnoreProperties({"cars", "password", "createdAt", "updatedAt"})
     private User expert;
 
     @ManyToOne
     @JoinColumn(name = "car_id")
+    @JsonIgnoreProperties({"user", "images"})
     private Car car;
 
     private String message;
@@ -34,7 +40,8 @@ public class ExpertiseRequest {
     @Enumerated(EnumType.STRING)
     private RequestStatus status = RequestStatus.PENDING;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "expertiseRequest")
+    @JsonIgnoreProperties("expertiseRequest")
     private ExpertReport report;
 
     public enum RequestStatus {
