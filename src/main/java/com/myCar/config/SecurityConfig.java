@@ -78,6 +78,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.DELETE, "/api/notifications/**").permitAll() // Autoriser uniquement les admins
                 .antMatchers(HttpMethod.POST, "/api/payments/generate-link").permitAll() // Autoriser uniquement les admins
                 .antMatchers("/api/payments/**").permitAll() // Ajouter cette ligne
+                .antMatchers("/api/reviews/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/reviews/car/*").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/reviews").permitAll()
+
 
                 .anyRequest().authenticated()
             .and()
