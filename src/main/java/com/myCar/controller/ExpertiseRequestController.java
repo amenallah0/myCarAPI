@@ -158,6 +158,16 @@ public class ExpertiseRequestController {
         }
     }
 
+    @GetMapping("/expertise-requests/user/{userId}")
+    public ResponseEntity<List<ExpertiseRequest>> getExpertiseRequestsByUser(@PathVariable Long userId) {
+        try {
+            List<ExpertiseRequest> requests = expertiseRequestService.getRequestsByUserId(userId);
+            return ResponseEntity.ok(requests);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     @Data
     @AllArgsConstructor
     static class ErrorResponse {

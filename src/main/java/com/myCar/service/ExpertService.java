@@ -72,7 +72,7 @@ public class ExpertService {
             ExpertiseRequest request = expertiseRequestRepository.findById(requestId)
                 .orElseThrow(() -> new ResourceNotFoundException("Expertise request not found"));
 
-            // Check if a report already exists for this request
+            // Vérifier si un rapport existe déjà
             ExpertReport existingReport = expertReportRepository.findByExpertiseRequestId(requestId)
                 .stream()
                 .findFirst()
@@ -80,37 +80,39 @@ public class ExpertService {
 
             ExpertReport report;
             if (existingReport != null) {
-                // Update existing report
+                // Mettre à jour le rapport existant
+                updateExistingReport(existingReport, reportDTO);
                 report = existingReport;
             } else {
-                // Create new report
+                // Créer un nouveau rapport
                 report = new ExpertReport();
                 report.setExpertiseRequest(request);
-                report.setUser(request.getUser());
+                report.setUser(request.getUser()); // Important: associer avec l'utilisateur qui a fait la demande
+                
+                // Mettre à jour les champs
+                report.setTitle(reportDTO.getTitle());
+                report.setCriticalData(reportDTO.getCriticalData());
+                report.setExpertiseDate(reportDTO.getExpertiseDate());
+                report.setMessage(reportDTO.getMessage());
+                report.setExpertName(reportDTO.getExpertName());
+                report.setExpertEmail(reportDTO.getExpertEmail());
+                report.setExpertPhone(reportDTO.getExpertPhone());
             }
 
-            // Update report fields
-            report.setTitle(reportDTO.getTitle());
-            report.setCriticalData(reportDTO.getCriticalData());
-            report.setExpertiseDate(reportDTO.getExpertiseDate());
-            report.setMessage(reportDTO.getMessage());
-            report.setExpertName(reportDTO.getExpertName());
-            report.setExpertEmail(reportDTO.getExpertEmail());
-            report.setExpertPhone(reportDTO.getExpertPhone());
-            
+            // Gérer le fichier si présent
             if (reportDTO.getFile() != null && !reportDTO.getFile().isEmpty()) {
                 report.setFileName(reportDTO.getFile().getOriginalFilename());
                 report.setFileType(reportDTO.getFile().getContentType());
                 report.setFileData(reportDTO.getFile().getBytes());
             }
-            
-            // Update request status
+
+            // Mettre à jour le statut de la demande
             request.setStatus(ExpertiseRequest.RequestStatus.COMPLETED);
             expertiseRequestRepository.save(request);
-            
+
             return expertReportRepository.save(report);
         } catch (Exception e) {
-            throw new RuntimeException("Erreur lors de la création du rapport", e);
+            throw new RuntimeException("Erreur lors de la création/mise à jour du rapport", e);
         }
     }
 
