@@ -52,7 +52,6 @@ public class ReviewService {
         review.setUser(user);
         review.setComment(reviewDTO.getComment());
         review.setRating(reviewDTO.getRating());
-        review.setCreatedAt(LocalDateTime.now());
         
         return reviewRepository.save(review);
     }
@@ -62,6 +61,7 @@ public class ReviewService {
         dto.setId(review.getId());
         dto.setCarId(review.getCar().getId());
         dto.setUserId(review.getUser().getId());
+        dto.setUserName(review.getUser().getUsername());
         dto.setComment(review.getComment());
         dto.setRating(review.getRating());
         dto.setCreatedAt(review.getCreatedAt());

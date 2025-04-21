@@ -3,6 +3,7 @@ package com.myCar.dto;
 
 import lombok.Data;
 import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Data
 public class ReviewDTO {
@@ -12,6 +13,7 @@ public class ReviewDTO {
     private String userName;
     private String comment;
     private int rating;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdAt;
 
     @Override
