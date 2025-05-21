@@ -1,0 +1,79 @@
+@startuml Authentication Class Diagram
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor White
+    ArrowColor Black
+    BorderColor Black
+}
+
+' Classes principales
+class User {
+    -id: Long
+    -email: String
+    -password: String
+    -firstName: String
+    -lastName: String
+    -phoneNumber: String
+    -createdAt: DateTime
+    -updatedAt: DateTime
+    +register()
+    +login()
+    +updateProfile()
+}
+
+class Role {
+    -id: Long
+    -name: String
+    -description: String
+}
+
+class UserRole {
+    -id: Long
+    -userId: Long
+    -roleId: Long
+}
+
+class AuthenticationService {
+    +registerUser(email: String, password: String): User
+    +login(email: String, password: String): String
+    +validateToken(token: String): Boolean
+    +logout(token: String): void
+}
+
+class UserService {
+    +updateUserProfile(userId: Long, userData: UserDTO): User
+    +getUserById(userId: Long): User
+    +getAllUsers(): List<User>
+}
+
+class RoleService {
+    +assignRole(userId: Long, roleId: Long): void
+    +removeRole(userId: Long, roleId: Long): void
+    +getAllRoles(): List<Role>
+}
+
+' Relations
+User "1" -- "*" UserRole
+Role "1" -- "*" UserRole
+UserService --> User
+RoleService --> Role
+RoleService --> UserRole
+AuthenticationService --> User
+
+note bottom of User
+  Représente un utilisateur du système
+  avec ses informations de base
+end note
+
+note bottom of Role
+  Définit les différents rôles
+  (USER, ADMIN, EXPERT)
+end note
+
+note bottom of AuthenticationService
+  Gère l'authentification et
+  la sécurité des utilisateurs
+end note
+
+@enduml 

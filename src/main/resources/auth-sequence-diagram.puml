@@ -1,0 +1,100 @@
+@startuml Authentication Sequence Diagram
+
+skinparam sequence {
+    ArrowColor Black
+    ActorBorderColor Black
+    LifeLineBorderColor Black
+    ParticipantBorderColor Black
+    ParticipantBackgroundColor White
+}
+
+actor "Utilisateur" as user
+participant "Interface\nUtilisateur" as ui
+participant "AuthenticationService" as auth
+participant "UserService" as userService
+participant "RoleService" as roleService
+database "Base de\ndonnées" as db
+
+== Inscription ==
+user -> ui: Demande d'inscription
+activate ui
+
+ui -> auth: registerUser(email, password)
+activate auth
+
+auth -> db: Vérifier si email existe
+activate db
+db --> auth: Résultat de la vérification
+deactivate db
+
+alt Email existe déjà
+    auth --> ui: Erreur: Email déjà utilisé
+else Email disponible
+    auth -> db: Créer nouvel utilisateur
+    activate db
+    db --> auth: Utilisateur créé
+    deactivate db
+    
+    auth -> roleService: assignRole(userId, "USER")
+    activate roleService
+    roleService -> db: Attribuer rôle USER
+    activate db
+    db --> roleService: Rôle attribué
+    deactivate db
+    roleService --> auth: Rôle assigné
+    deactivate roleService
+    
+    auth --> ui: Inscription réussie
+end
+
+ui --> user: Confirmation d'inscription
+deactivate auth
+deactivate ui
+
+== Connexion ==
+user -> ui: Demande de connexion
+activate ui
+
+ui -> auth: login(email, password)
+activate auth
+
+auth -> db: Vérifier identifiants
+activate db
+db --> auth: Résultat de la vérification
+deactivate db
+
+alt Identifiants valides
+    auth -> db: Générer token JWT
+    activate db
+    db --> auth: Token généré
+    deactivate db
+    
+    auth --> ui: Token JWT
+    ui --> user: Connexion réussie
+else Identifiants invalides
+    auth --> ui: Erreur: Identifiants invalides
+    ui --> user: Message d'erreur
+end
+
+deactivate auth
+deactivate ui
+
+== Déconnexion ==
+user -> ui: Demande de déconnexion
+activate ui
+
+ui -> auth: logout(token)
+activate auth
+
+auth -> db: Invalider token
+activate db
+db --> auth: Token invalidé
+deactivate db
+
+auth --> ui: Déconnexion réussie
+ui --> user: Confirmation de déconnexion
+
+deactivate auth
+deactivate ui
+
+@enduml 

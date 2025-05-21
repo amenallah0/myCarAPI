@@ -1,0 +1,47 @@
+@startuml Car Management System Use Cases
+
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+
+actor "Utilisateur" as user
+actor "Expert" as expert
+actor "Administrateur" as admin
+
+rectangle "Système de Gestion de Véhicules" {
+    usecase "Création d'annonce" as UC1
+    usecase "Recherche de véhicules" as UC2
+    usecase "Estimation automatique" as UC3
+    usecase "Demande d'expertise" as UC4
+    usecase "Messagerie" as UC5
+    usecase "Gestion de compte" as UC6
+    usecase "Validation des annonces" as UC7
+    usecase "Gestion des experts" as UC8
+    usecase "Gestion des utilisateurs" as UC9
+}
+
+' Relations Utilisateur
+user --> UC1
+user --> UC2
+user --> UC3
+user --> UC4
+user --> UC5
+user --> UC6
+
+' Relations Expert
+expert --> UC4
+expert --> UC5
+expert --> UC6
+
+' Relations Administrateur
+admin --> UC7
+admin --> UC8
+admin --> UC9
+admin --> UC6
+
+' Inclusions et Extensions
+UC1 ..> UC6 : <<include>>
+UC4 ..> UC5 : <<include>>
+UC7 ..> UC1 : <<extend>>
+UC8 ..> UC4 : <<extend>>
+
+@enduml 

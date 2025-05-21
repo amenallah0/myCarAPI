@@ -38,6 +38,7 @@ public class ExpertiseRequest {
     private LocalDateTime requestDate;
     
     @Enumerated(EnumType.STRING)
+    @Column(name = "status")
     private RequestStatus status = RequestStatus.PENDING;
 
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "expertiseRequest")

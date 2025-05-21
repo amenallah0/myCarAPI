@@ -1,0 +1,110 @@
+@startuml Sprint 3 - Expertise et Paiement
+
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+
+actor "Utilisateur" as user
+actor "Expert" as expert
+actor "Vendeur" as seller
+actor "Administrateur" as admin
+actor "Système de\nPaiement" as payment
+
+rectangle "Gestion des Expertises" {
+    usecase "Demander une expertise" as UC1 {
+        note right
+            - Sélection du véhicule
+            - Date souhaitée
+            - Localisation
+            - Motif de l'expertise
+        end note
+    }
+    
+    usecase "Créer un rapport d'expertise" as UC2 {
+        note right
+            - État du véhicule
+            - Photos
+            - Recommandations
+            - Évaluation
+        end note
+    }
+    
+    usecase "Valider l'expertise" as UC3
+    usecase "Consulter les rapports" as UC4
+}
+
+rectangle "Gestion des Experts" {
+    usecase "Gérer les experts" as UC5 {
+        note right
+            - Ajouter/Supprimer expert
+            - Attribuer zones
+            - Évaluer performance
+        end note
+    }
+    
+    usecase "Assigner des expertises" as UC6
+    usecase "Voir planning" as UC7
+}
+
+rectangle "Mise en avant des annonces" {
+    usecase "Payer pour mise en avant" as UC8 {
+        note right
+            - Choix du pack
+            - Durée
+            - Position
+        end note
+    }
+    
+    usecase "Gérer les paiements" as UC9
+    usecase "Activer mise en avant" as UC10
+}
+
+' Relations Utilisateur
+user --> UC1
+user --> UC4
+
+' Relations Expert
+expert --> UC2
+expert --> UC4
+expert --> UC7
+
+' Relations Vendeur
+seller --> UC8
+seller --> UC4
+
+' Relations Administrateur
+admin --> UC5
+admin --> UC6
+admin --> UC9
+
+' Relations Système de Paiement
+payment --> UC8
+payment --> UC9
+
+' Inclusions et Extensions
+UC1 ..> UC6 : <<include>>
+UC2 ..> UC3 : <<include>>
+UC8 ..> UC9 : <<include>>
+UC9 ..> UC10 : <<include>>
+
+' Préconditions
+note right of UC1
+  L'utilisateur doit être connecté
+  et avoir une annonce active
+end note
+
+note right of UC2
+  L'expert doit être assigné
+  à cette expertise
+end note
+
+note right of UC8
+  Le vendeur doit avoir
+  une annonce active
+end note
+
+note right of UC5
+  Seul l'administrateur peut
+  gérer les experts
+end note
+
+@enduml 

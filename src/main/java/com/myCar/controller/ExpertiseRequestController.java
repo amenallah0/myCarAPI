@@ -6,6 +6,8 @@ import com.myCar.dto.ExpertReportDTO;
 import com.myCar.service.ExpertiseRequestService;
 import com.myCar.service.ExpertService;
 import com.myCar.exception.ResourceNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,8 @@ import java.util.List;
 @RequestMapping("/api/expertise-requests")
 @CrossOrigin(origins = "*")
 public class ExpertiseRequestController {
+
+    private static final Logger logger = LoggerFactory.getLogger(ExpertiseRequestController.class);
 
     @Autowired
     private ExpertiseRequestService expertiseRequestService;
@@ -40,6 +44,7 @@ public class ExpertiseRequestController {
         return ResponseEntity.ok(request);
     }
 
+    
     @GetMapping("/expert/{expertId}")
     public ResponseEntity<?> getExpertRequests(@PathVariable Long expertId) {
         try {
@@ -59,8 +64,15 @@ public class ExpertiseRequestController {
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<ExpertiseRequest>> getUserRequests(@PathVariable Long userId) {
-        List<ExpertiseRequest> requests = expertiseRequestService.getRequestsByUserId(userId);
-        return ResponseEntity.ok(requests);
+        logger.info("Received request for user expertise requests. User ID: {}", userId);
+        try {
+            List<ExpertiseRequest> requests = expertiseRequestService.getRequestsByUserId(userId);
+            logger.info("Found {} requests for user {}", requests.size(), userId);
+            return ResponseEntity.ok(requests);
+        } catch (Exception e) {
+            logger.error("Error fetching user requests", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PutMapping("/{requestId}/accept")
@@ -162,6 +174,16 @@ public class ExpertiseRequestController {
     public ResponseEntity<List<ExpertiseRequest>> getExpertiseRequestsByUser(@PathVariable Long userId) {
         try {
             List<ExpertiseRequest> requests = expertiseRequestService.getRequestsByUserId(userId);
+            return ResponseEntity.ok(requests);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/expertise-requests/expert/{expertId}")
+    public ResponseEntity<List<ExpertiseRequest>> getExpertiseRequestsByExpert(@PathVariable Long expertId) {
+        try {
+            List<ExpertiseRequest> requests = expertiseRequestService.getRequestsByExpertId(expertId);
             return ResponseEntity.ok(requests);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

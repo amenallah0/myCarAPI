@@ -1,0 +1,86 @@
+@startuml Gestion des Annonces - Diagramme de Classes
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor White
+    ArrowColor Black
+    BorderColor Black
+}
+
+class Utilisateur {
+    -id: Long
+    -nom: String
+    -email: String
+    -motDePasse: String
+    -role: String
+    +creerAnnonce()
+    +modifierAnnonce()
+    +supprimerAnnonce()
+}
+
+class Annonce {
+    -id: Long
+    -titre: String
+    -description: String
+    -prix: Double
+    -dateCreation: DateTime
+    -dateModification: DateTime
+    -localisation: String
+    -etat: String
+    +modifier()
+    +supprimer()
+}
+
+class Voiture {
+    -id: Long
+    -marque: String
+    -modele: String
+    -annee: Int
+    -kilometrage: Int
+    -carburant: String
+    -transmission: String
+    -couleur: String
+}
+
+class Photo {
+    -id: Long
+    -url: String
+    -description: String
+}
+
+class AnnonceService {
+    +creerAnnonce(annonce: Annonce): Annonce
+    +modifierAnnonce(annonceId: Long, data: Annonce): Annonce
+    +supprimerAnnonce(annonceId: Long): void
+    +rechercherAnnonces(filtre: FiltreRecherche): List<Annonce>
+}
+
+class FiltreRecherche {
+    -prixMin: Double
+    -prixMax: Double
+    -marque: String
+    -modele: String
+    -anneeMin: Int
+    -anneeMax: Int
+    -kilometrageMax: Int
+    -carburant: String
+    -transmission: String
+    -localisation: String
+}
+
+Utilisateur "1" -- "*" Annonce : possede
+Annonce "1" -- "1" Voiture : concerne
+Annonce "1" -- "*" Photo : contient
+AnnonceService --> Annonce
+AnnonceService --> FiltreRecherche
+FiltreRecherche ..> Annonce : filtre
+
+note bottom of Annonce
+  Représente une annonce publiée par un vendeur
+end note
+
+note bottom of FiltreRecherche
+  Permet de filtrer les annonces lors de la recherche
+end note
+
+@enduml 

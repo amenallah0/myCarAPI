@@ -10,9 +10,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.security.Principal;
 
 @RestController
-@RequestMapping("/cars")
+@RequestMapping("/api/cars")  // Change from "/cars" to "/api/cars"
 public class CarController {
 
     private final CarService carService;
@@ -82,16 +83,18 @@ public class CarController {
     
     @PutMapping("/{id}/promote")
     @CrossOrigin(origins = "*")
-    public ResponseEntity<Car> updatePromotionStatus(
-            @PathVariable Long id,
-            @RequestParam boolean promoted) {
+    public ResponseEntity<?> promoteCar(@PathVariable Long id, @RequestParam boolean promoted, Principal principal) {
+        System.out.println("[BACKEND] promoteCar called with id=" + id + ", promoted=" + promoted);
+        System.out.println("[BACKEND] Authenticated user: " + principal.getName());
         try {
             System.out.println("Updating promotion status for car " + id + " to " + promoted);
             Car updatedCar = carService.updatePromotionStatus(id, promoted);
-            return ResponseEntity.ok(updatedCar);
+            System.out.println("[BACKEND] Promotion successful for car id=" + id);
+            return ResponseEntity.ok().body("Promotion updated");
         } catch (Exception e) {
-            System.err.println("Error updating promotion status: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            System.err.println("[BACKEND] ERROR in promoteCar: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
@@ -109,5 +112,11 @@ public class CarController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Car>> getCarsByUserId(@PathVariable Long userId) {
+        List<Car> cars = carService.getCarsByUserId(userId);
+        return ResponseEntity.ok(cars);
     }
 }

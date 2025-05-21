@@ -1,0 +1,121 @@
+@startuml Sprint 3 - Expertise et Paiement - Diagramme de Classes
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor White
+    ArrowColor Black
+    BorderColor Black
+}
+
+class Utilisateur {
+    -id: Long
+    -nom: String
+    -email: String
+    -role: String
+    +demanderExpertise()
+    +consulterRapports()
+}
+
+class Expert {
+    -id: Long
+    -specialite: String
+    -zoneGeographique: String
+    -disponibilite: Boolean
+    +creerRapport()
+    +voirPlanning()
+}
+
+class Expertise {
+    -id: Long
+    -dateDemande: DateTime
+    -dateSouhaitee: DateTime
+    -localisation: String
+    -motif: String
+    -statut: String
+    +valider()
+    +annuler()
+}
+
+class RapportExpertise {
+    -id: Long
+    -dateCreation: DateTime
+    -etatVehicule: String
+    -evaluation: Double
+    -recommandations: String
+    +genererPDF()
+}
+
+class PhotoExpertise {
+    -id: Long
+    -url: String
+    -description: String
+    -type: String
+}
+
+class Annonce {
+    -id: Long
+    -titre: String
+    -statut: String
+    -dateCreation: DateTime
+    +mettreEnAvant()
+}
+
+class PackMiseEnAvant {
+    -id: Long
+    -nom: String
+    -prix: Double
+    -duree: Int
+    -position: String
+}
+
+class Paiement {
+    -id: Long
+    -montant: Double
+    -date: DateTime
+    -statut: String
+    -type: String
+    +valider()
+    +annuler()
+}
+
+class ExpertiseService {
+    +demanderExpertise(expertise: Expertise): Expertise
+    +assignerExpert(expertiseId: Long, expertId: Long): void
+    +creerRapport(rapport: RapportExpertise): RapportExpertise
+    +validerExpertise(expertiseId: Long): void
+}
+
+class PaiementService {
+    +effectuerPaiement(paiement: Paiement): Paiement
+    +activerMiseEnAvant(annonceId: Long, packId: Long): void
+    +verifierStatutPaiement(paiementId: Long): String
+}
+
+' Relations
+Utilisateur "1" -- "*" Expertise : demande
+Expert "1" -- "*" Expertise : effectue
+Expertise "1" -- "1" RapportExpertise : genere
+RapportExpertise "1" -- "*" PhotoExpertise : contient
+Annonce "1" -- "*" Paiement : genere
+Paiement "1" -- "1" PackMiseEnAvant : concerne
+ExpertiseService --> Expertise
+ExpertiseService --> RapportExpertise
+PaiementService --> Paiement
+PaiementService --> Annonce
+
+note bottom of Expertise
+  Représente une demande d'expertise
+  avec son statut et ses détails
+end note
+
+note bottom of RapportExpertise
+  Contient les résultats détaillés
+  de l'expertise
+end note
+
+note bottom of PackMiseEnAvant
+  Définit les différents packs
+  de mise en avant disponibles
+end note
+
+@enduml 

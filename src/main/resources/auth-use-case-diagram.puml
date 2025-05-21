@@ -1,0 +1,32 @@
+@startuml Authentication and User Management Use Cases
+
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+
+actor "Utilisateur" as user
+actor "Administrateur" as admin
+
+rectangle "Système d'Authentification et Gestion des Utilisateurs" {
+    usecase "S'inscrire" as UC1
+    usecase "Se connecter" as UC2
+    usecase "Gérer les rôles" as UC3
+    usecase "Mettre à jour le profil" as UC4
+    usecase "Gérer les utilisateurs" as UC5
+}
+
+' Relations Utilisateur
+user --> UC1
+user --> UC2
+user --> UC4
+
+' Relations Administrateur
+admin --> UC3
+admin --> UC5
+admin --> UC2
+
+' Inclusions et Extensions
+UC1 ..> UC2 : <<extend>>
+UC3 ..> UC5 : <<include>>
+UC4 ..> UC2 : <<include>>
+
+@enduml 

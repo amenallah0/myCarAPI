@@ -1,7 +1,8 @@
 package com.myCar.config;
 
 import java.util.Arrays;
-
+import javax.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -11,14 +12,54 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.web.filter.OncePerRequestFilter;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+import com.myCar.domain.User;
+import com.myCar.security.JwtAuthenticationFilter;
+import com.myCar.security.JwtTokenProvider;
+import com.myCar.security.CustomUserDetailsService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    private final JwtTokenProvider tokenProvider;
+    private final CustomUserDetailsService customUserDetailsService;
+
+    @Autowired
+    public SecurityConfig(JwtTokenProvider tokenProvider, CustomUserDetailsService customUserDetailsService) {
+        this.tokenProvider = tokenProvider;
+        this.customUserDetailsService = customUserDetailsService;
+    }
+
+    public class AuthResponse {
+        private String token;
+        private User user;
+    
+        public AuthResponse(String token, User user) {
+            this.token = token;
+            this.user = user;
+        }
+    
+        // Getters and setters
+        public String getToken() { return token; }
+        public void setToken(String token) { this.token = token; }
+        public User getUser() { return user; }
+        public void setUser(User user) { this.user = user; }
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -45,48 +86,98 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
+    public void configure(org.springframework.security.config.annotation.web.builders.WebSecurity web) throws Exception {
+        web.ignoring().antMatchers(HttpMethod.POST, "/api/users/refresh-token");
+    }
+
+    @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-            .cors()
-            .and()
-            .csrf().disable()
+            .cors().and().csrf().disable()
             .authorizeRequests()
-                .antMatchers("/api/users/expert/signup").permitAll() // Permettre l'accès à l'inscription expert
-                .antMatchers("/api/users/signin").permitAll()        // Permettre l'accès à la connexion
-                .antMatchers("/api/users/**").permitAll()           // Permettre l'accès aux autres endpoints users
-                .antMatchers("/users/**").permitAll() // Permit access to these endpoints without authentication
-                .antMatchers("/cars/**").permitAll() // Permit access to these endpoints without authentication
-                .antMatchers("/api/files/**").permitAll() // Permit access to these endpoints without authentication
-                .antMatchers("/api/experts/**").permitAll() // Ajout de la sécurité pour les routes expert
-                .antMatchers("/api/users/admin/signup").permitAll()     // Permettre l'accès à l'inscription admin
-                .antMatchers("/api/expert-requests/**").permitAll() // Ajout de la sécurité pour les routes expert
-                .antMatchers("/api/admin/**").permitAll() // Ajout de la sécurité pour les routes admin
-                .antMatchers("/api/admin/expert-requests/**").permitAll() // Ajout de la sécurité pour les routes admin
-                .antMatchers("/api/admin/experts/**").permitAll() // Ajout de la sécurité pour les routes admin
-                .antMatchers("/api/admin/cars/**").permitAll() // Ajout de la sécurité pour les routes admin
-                .antMatchers("/api/admin/sales/**").permitAll() // Ajout de la sécurité pour les routes admin
-                .antMatchers("/api/admin/users/**").permitAll() // Ajout de la sécurité pour les routes admin
-                .antMatchers(HttpMethod.POST, "/api/annonces").permitAll() // Autoriser uniquement les admins à créer des annonces
-                .antMatchers(HttpMethod.GET, "/api/annonces").permitAll() // Autoriser uniquement les admins à créer des annonces
-                .antMatchers(HttpMethod.DELETE, "/api/annonces/{id}").permitAll() // Autoriser uniquement les admins à créer des annonces
-                .antMatchers(HttpMethod.PUT, "/api/annonces/{id}").permitAll() // Autoriser uniquement les admins à créer des annonces
-                .antMatchers("/api/expertise-requests/**").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/experts/expertise-requests/*/submit-report")
-                .hasRole("EXPERT")
-                .antMatchers(HttpMethod.POST, "/api/notifications").permitAll() // Autoriser uniquement les admins
-                .antMatchers(HttpMethod.GET, "/api/notifications").permitAll() // Autoriser uniquement les admins
-                .antMatchers(HttpMethod.DELETE, "/api/notifications/**").permitAll() // Autoriser uniquement les admins
-                .antMatchers(HttpMethod.POST, "/api/payments/generate-link").permitAll() // Autoriser uniquement les admins
-                .antMatchers("/api/payments/**").permitAll() // Ajouter cette ligne
-                .antMatchers("/api/reviews/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/reviews/car/*").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/reviews").permitAll()
-
-
+                .antMatchers(HttpMethod.POST, "/api/users/refresh-token").permitAll()
+                .antMatchers("/api/users/signin", "/api/users/signup").permitAll()
+                .antMatchers("/api/users/expert/signup", "/api/users/admin/signup").permitAll()
+                .antMatchers("/api/cars", "/api/cars/**").permitAll()
+                .antMatchers("/api/files/**", "/images/**", "/assets/**", "/static/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/annonces", "/api/reviews/car/**").permitAll()
+                .antMatchers("/api/cars/latest", "/api/cars/promoted").permitAll()
+                .antMatchers("/api/admin/cars/**").permitAll()
+                .antMatchers(HttpMethod.PUT, "/api/cars/*/promote").hasAnyRole("USER","EXPERT","ADMIN")
+                
+                // Routes Admin
+                .antMatchers("/api/admin/**").hasRole("ADMIN")
+                .antMatchers("/api/admin/expert-requests/**").hasRole("ADMIN")
+                .antMatchers("/api/admin/experts/**").hasRole("ADMIN")
+                .antMatchers("/api/admin/sales/**").hasRole("ADMIN")
+                .antMatchers("/api/admin/users/**").hasRole("ADMIN")
+                
+                // Routes Expert
+                .antMatchers("/api/experts/**").hasRole("EXPERT")
+                .antMatchers(HttpMethod.POST, "/api/experts/expertise-requests/*/submit-report").hasRole("EXPERT")
+                .antMatchers("/api/expert-requests/**").hasAnyRole("USER", "ADMIN")
+                
+                // Routes Annonces
+                .antMatchers(HttpMethod.POST, "/api/annonces").hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.DELETE, "/api/annonces/{id}").hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.PUT, "/api/annonces/{id}").hasAnyRole("USER", "ADMIN")
+                
+                // Routes Expertise
+                .antMatchers("/api/expertise-requests/**").authenticated()
+                .antMatchers("/api/expertise-requests/expert/**").hasRole("EXPERT")
+                
+                // Routes Notifications
+                .antMatchers("/api/notifications/**").authenticated()
+                
+                // Routes Paiements
+                .antMatchers("/api/payments/generate-link").authenticated()
+                .antMatchers("/api/payments/**").authenticated()
+                
+                // Routes Reviews
+                .antMatchers(HttpMethod.POST, "/api/reviews").hasAnyRole("USER", "EXPERT")
+                .antMatchers("/api/reviews/**").authenticated()
+                
+                // Routes Users
+                .antMatchers(HttpMethod.GET, "/api/users/**").authenticated()
+                .antMatchers(HttpMethod.PUT, "/api/users/**").authenticated()
+                .antMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")
+                
+                // Routes Expertise Count
+                .antMatchers("/api/users/experts/{expertId}/expertise-count").hasAnyRole("EXPERT", "ADMIN")
+                .antMatchers("/api/users/expertise-count").authenticated()
+                
+                // Route par défaut (doit être la dernière)
                 .anyRequest().authenticated()
             .and()
+            .exceptionHandling()
+                .authenticationEntryPoint((request, response, authException) -> {
+                    response.setContentType("application/json");
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.getWriter().write("{\"error\": \"" + authException.getMessage() + "\"}");
+                })
+                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                    response.setContentType("application/json");
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.getWriter().write("{\"error\": \"" + accessDeniedException.getMessage() + "\"}");
+                })
+            .and()
             .sessionManagement()
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
+            .addFilterBefore(new JwtAuthenticationFilter(tokenProvider, customUserDetailsService),
+                    UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(new OncePerRequestFilter() {
+                @Override
+                protected void doFilterInternal(HttpServletRequest request,
+                                             HttpServletResponse response,
+                                             FilterChain filterChain)
+                        throws ServletException, IOException {
+                    System.out.println("Request URL: " + request.getRequestURL());
+                    System.out.println("Request Method: " + request.getMethod());
+                    System.out.println("Authorization header: " + request.getHeader("Authorization"));
+                    filterChain.doFilter(request, response);
+                }
+            }, UsernamePasswordAuthenticationFilter.class);
     }
 
     @Bean
@@ -100,5 +191,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        return mapper;
     }
 }

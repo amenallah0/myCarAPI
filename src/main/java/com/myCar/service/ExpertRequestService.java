@@ -58,7 +58,7 @@ public class ExpertRequestService {
         
         // Mettre à jour le rôle de l'utilisateur
         User user = request.getUser();
-        user.setRole(Role.EXPERT);
+        user.setRole(Role.ROLE_EXPERT);
         userRepository.save(user);
         
         return expertRequestRepository.save(request);

@@ -1,0 +1,90 @@
+@startuml Sprint 2 - Gestion des Annonces et Recherche
+
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+
+actor "Vendeur" as seller
+actor "Acheteur" as buyer
+actor "Système" as system
+
+rectangle "Gestion des Annonces" {
+    usecase "Créer une annonce" as UC1
+    usecase "Modifier une annonce" as UC2
+    usecase "Supprimer une annonce" as UC3
+    usecase "Valider les données" as UC4
+}
+
+rectangle "Recherche de Véhicules" {
+    usecase "Rechercher des voitures" as UC5
+    usecase "Filtrer les résultats" as UC6
+    usecase "Trier les résultats" as UC7
+    usecase "Afficher les détails" as UC8
+}
+
+' Relations Vendeur
+seller --> UC1
+seller --> UC2
+seller --> UC3
+
+' Relations Acheteur
+buyer --> UC5
+buyer --> UC6
+buyer --> UC7
+buyer --> UC8
+
+' Relations Système
+system --> UC4
+
+' Inclusions et Extensions
+UC1 ..> UC4 : <<include>>
+UC2 ..> UC4 : <<include>>
+UC5 ..> UC6 : <<extend>>
+UC5 ..> UC7 : <<extend>>
+UC5 ..> UC8 : <<extend>>
+
+' Notes détaillées
+note right of UC1
+  - Titre
+  - Description
+  - Prix
+  - Photos
+  - Caractéristiques du véhicule
+  - Localisation
+  L'utilisateur doit être connecté
+  et avoir le rôle VENDEUR
+end note
+
+note right of UC2
+  - Mise à jour des informations
+  - Ajout/Suppression de photos
+  - Modification du prix
+  L'utilisateur doit être le propriétaire
+  de l'annonce
+end note
+
+note right of UC3
+  L'utilisateur doit être le propriétaire
+  de l'annonce
+end note
+
+note right of UC5
+  - Recherche par mot-clé
+  - Recherche par localisation
+end note
+
+note right of UC6
+  - Prix min/max
+  - Marque/Modèle
+  - Année
+  - Kilométrage
+  - Type de carburant
+  - Type de transmission
+end note
+
+note right of UC7
+  - Par prix
+  - Par date
+  - Par pertinence
+end note
+
+@enduml 

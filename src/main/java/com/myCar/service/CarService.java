@@ -99,4 +99,8 @@ public class CarService {
         return carRepository.save(car);
     }
 
+    public List<Car> getCarsByUserId(Long userId) {
+        return carRepository.findByUserId(userId);
+    }
+
 }

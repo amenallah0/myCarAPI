@@ -1,0 +1,131 @@
+@startuml Expertise et Paiement - Diagramme de Classes
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor White
+    ArrowColor Black
+    BorderColor Black
+}
+
+' Classes principales
+class Utilisateur {
+    -id: Long
+    -nom: String
+    -email: String
+    -role: String
+    +demanderExpertise()
+    +consulterRapports()
+}
+
+class Expert {
+    -id: Long
+    -specialite: String
+    -zoneGeographique: String
+    -disponibilite: Boolean
+    -evaluation: Double
+    +creerRapport()
+    +voirPlanning()
+}
+
+class Expertise {
+    -id: Long
+    -dateDemande: DateTime
+    -dateSouhaitee: DateTime
+    -localisation: String
+    -motif: String
+    -statut: String
+    -prix: Double
+    +valider()
+    +annuler()
+}
+
+class RapportExpertise {
+    -id: Long
+    -dateCreation: DateTime
+    -etatVehicule: String
+    -evaluation: Double
+    -recommandations: String
+    -conclusion: String
+    +genererPDF()
+}
+
+class PhotoExpertise {
+    -id: Long
+    -url: String
+    -description: String
+    -type: String
+    -datePrise: DateTime
+}
+
+class Annonce {
+    -id: Long
+    -titre: String
+    -statut: String
+    -dateCreation: DateTime
+    -miseEnAvant: Boolean
+    +mettreEnAvant()
+}
+
+class PackMiseEnAvant {
+    -id: Long
+    -nom: String
+    -prix: Double
+    -duree: Int
+    -position: String
+    -description: String
+}
+
+class Paiement {
+    -id: Long
+    -montant: Double
+    -date: DateTime
+    -statut: String
+    -type: String
+    -reference: String
+    +valider()
+    +annuler()
+}
+
+class ExpertiseService {
+    +demanderExpertise(expertise: Expertise): Expertise
+    +assignerExpert(expertiseId: Long, expertId: Long): void
+    +creerRapport(rapport: RapportExpertise): RapportExpertise
+    +validerExpertise(expertiseId: Long): void
+    +calculerPrixExpertise(expertiseId: Long): Double
+}
+
+class PaiementService {
+    +effectuerPaiement(paiement: Paiement): Paiement
+    +activerMiseEnAvant(annonceId: Long, packId: Long): void
+    +verifierStatutPaiement(paiementId: Long): String
+    +calculerPrixPack(packId: Long): Double
+}
+
+' Relations
+Utilisateur "1" -- "*" Expertise : demande
+Expert "1" -- "*" Expertise : effectue
+Expertise "1" -- "1" RapportExpertise : genere
+RapportExpertise "1" -- "*" PhotoExpertise : contient
+Annonce "1" -- "*" Paiement : genere
+Paiement "1" -- "1" PackMiseEnAvant : concerne
+ExpertiseService --> Expertise
+ExpertiseService --> RapportExpertise
+PaiementService --> Paiement
+PaiementService --> Annonce
+
+note bottom of Expertise
+  Représente une demande d'expertise
+  avec son statut et ses détails
+end note
+
+note bottom of RapportExpertise
+  Contient les résultats détaillés
+  de l'expertise
+end note
+
+note bottom of PackMiseEnAvant
+  Définit les différents packs
+  de mise en avant disponibles
+end note
+
+@enduml 

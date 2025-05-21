@@ -1,0 +1,87 @@
+@startuml Expertise et Paiement - Diagramme de Cas d'Utilisation
+
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+
+' Partie Expertise
+actor "Utilisateur" as user
+actor "Expert" as expert
+actor "Administrateur" as admin
+
+rectangle "Partie 1 : Gestion des Expertises" {
+    usecase "Demander une expertise" as UC1
+    usecase "Créer un rapport d'expertise" as UC2
+    usecase "Valider l'expertise" as UC3
+    usecase "Consulter les rapports" as UC4
+    usecase "Gérer les experts" as UC5
+    usecase "Assigner des expertises" as UC6
+    usecase "Voir/Gérer le planning" as UC7
+}
+
+user --> UC1
+user --> UC4
+expert --> UC2
+expert --> UC4
+expert --> UC7
+admin --> UC5
+admin --> UC6
+admin --> UC7
+
+UC1 ..> UC6 : <<include>>
+UC2 ..> UC3 : <<include>>
+UC5 ..> UC7 : <<extend>>
+
+note right of UC1
+  - Sélection du véhicule
+  - Date souhaitée
+  - Localisation
+  - Motif de l'expertise
+  L'utilisateur doit être connecté
+  et avoir une annonce active
+end note
+
+note right of UC2
+  - État du véhicule
+  - Photos
+  - Recommandations
+  - Évaluation
+  L'expert doit être assigné
+  à cette expertise
+end note
+
+note right of UC5
+  - Ajouter/Supprimer expert
+  - Attribuer zones
+  - Évaluer performance
+  Seul l'administrateur peut
+  gérer les experts
+end note
+
+' Partie Paiement
+actor "Vendeur" as seller
+actor "Système de\nPaiement" as payment
+
+rectangle "Partie 2 : Paiement et Mise en avant" {
+    usecase "Payer pour mise en avant" as UC8
+    usecase "Gérer les paiements" as UC9
+    usecase "Activer mise en avant" as UC10
+}
+
+seller --> UC8
+payment --> UC8
+payment --> UC9
+seller --> UC10
+admin --> UC9
+
+UC8 ..> UC9 : <<include>>
+UC9 ..> UC10 : <<include>>
+
+note right of UC8
+  - Choix du pack
+  - Durée
+  - Position
+  Le vendeur doit avoir
+  une annonce active
+end note
+
+@enduml 

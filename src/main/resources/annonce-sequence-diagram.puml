@@ -1,0 +1,58 @@
+@startuml Processus de création d'annonce
+
+skinparam sequence {
+    ArrowColor Black
+    ActorBorderColor Black
+    LifeLineBorderColor Black
+    ParticipantBorderColor Black
+    ParticipantBackgroundColor White
+}
+
+actor "Vendeur (Utilisateur)" as vendeur
+participant "Interface\nUtilisateur" as ui
+participant "AnnonceService" as service
+participant "Annonce" as annonce
+participant "Voiture" as voiture
+participant "Photo" as photo
+participant "Base de\ndonnées" as db
+
+vendeur -> ui: Remplir formulaire annonce
+ui -> service: creerAnnonce(annonceData)
+activate service
+
+service -> voiture: creerVoiture(dataVoiture)
+activate voiture
+voiture -> db: Sauvegarder voiture
+activate db
+db --> voiture: Voiture créée (id)
+deactivate db
+voiture --> service: Voiture créée
+ deactivate voiture
+
+service -> annonce: creerAnnonce(dataAnnonce, voiture)
+activate annonce
+annonce -> db: Sauvegarder annonce
+activate db
+db --> annonce: Annonce créée (id)
+deactivate db
+annonce --> service: Annonce créée
+ deactivate annonce
+
+loop Pour chaque photo
+    service -> photo: creerPhoto(dataPhoto)
+    activate photo
+    photo -> db: Sauvegarder photo
+    activate db
+    db --> photo: Photo créée (id)
+    deactivate db
+    photo --> service: Photo créée
+    deactivate photo
+    service -> db: Associer photo à annonce
+end
+
+service --> ui: Confirmation création annonce
+ui --> vendeur: Affichage confirmation
+
+deactivate service
+
+@enduml 

@@ -10,6 +10,8 @@ import com.myCar.repository.UserRepository;
 import com.myCar.repository.CarRepository;
 import com.myCar.exception.ResourceNotFoundException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,9 +20,12 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Arrays;
 
 @Service
 public class ExpertiseRequestService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ExpertiseRequestService.class);
 
     @Autowired
     private ExpertiseRequestRepository expertiseRequestRepository;
@@ -52,52 +57,37 @@ public class ExpertiseRequestService {
 
     @Transactional(readOnly = true)
     public List<ExpertiseRequest> getRequestsByExpertId(Long expertId) {
-        try {
-            // Vérifier si l'expert existe
-            User expert = userRepository.findById(expertId)
-                .orElseThrow(() -> new ResourceNotFoundException("Expert non trouvé avec l'id : " + expertId));
-                
-            List<ExpertiseRequest> requests = expertiseRequestRepository.findByExpertId(expertId);
-            
-            // Initialiser les collections lazy de manière sécurisée
-            requests.forEach(request -> {
-                try {
-                    if (request.getCar() != null) {
-                        request.getCar().getId();
-                    }
-                    if (request.getUser() != null) {
-                        request.getUser().getId();
-                    }
-                    if (request.getExpert() != null) {
-                        request.getExpert().getId();
-                    }
-                    if (request.getReport() != null) {
-                        request.getReport().getId();
-                    }
-                } catch (Exception e) {
-                    // Log l'erreur mais continuer avec les autres requêtes
-                    e.printStackTrace();
-                }
-            });
-            
-            return requests;
-        } catch (ResourceNotFoundException e) {
-            throw e;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Erreur lors du chargement des expertises: " + e.getMessage(), e);
-        }
+        return expertiseRequestRepository.findByExpertId(expertId);
     }
 
+    @Transactional(readOnly = true)
     public List<ExpertiseRequest> getRequestsByUserId(Long userId) {
-        return expertiseRequestRepository.findByUserId(userId);
+        logger.info("Fetching requests for user ID: {}", userId);
+        List<ExpertiseRequest> requests = expertiseRequestRepository.findByUserId(userId);
+        logger.info("Found {} requests for user {}", requests.size(), userId);
+        
+        // Log détaillé de chaque requête
+        requests.forEach(request -> {
+            logger.info("Request: ID={}, Status={}, Expert={}, Car={}, Report={}",
+                request.getId(),
+                request.getStatus(),
+                request.getExpert() != null ? request.getExpert().getId() : "none",
+                request.getCar() != null ? request.getCar().getId() : "none",
+                request.getReport() != null ? "present" : "none"
+            );
+        });
+        
+        return requests;
     }
 
     public ExpertiseRequest acceptRequest(Long requestId) {
         ExpertiseRequest request = expertiseRequestRepository.findById(requestId)
             .orElseThrow(() -> new ResourceNotFoundException("Request not found"));
+        System.out.println("Avant: " + request.getStatus());
         request.setStatus(ExpertiseRequest.RequestStatus.ACCEPTED);
-        return expertiseRequestRepository.save(request);
+        ExpertiseRequest saved = expertiseRequestRepository.save(request);
+        System.out.println("Après: " + saved.getStatus());
+        return saved;
     }
 
     public ExpertiseRequest rejectRequest(Long requestId) {
@@ -172,5 +162,13 @@ public class ExpertiseRequestService {
             .filter(request -> request.getReport() != null)
             .map(ExpertiseRequest::getReport)
             .collect(Collectors.toList());
+    }
+
+    public void debugUserRequests(Long userId) {
+        List<Object[]> rawRequests = expertiseRequestRepository.findRawRequestsByUserId(userId);
+        logger.info("Raw database records for user {}: {}", userId, rawRequests.size());
+        rawRequests.forEach(row -> {
+            logger.info("Raw request data: {}", Arrays.toString(row));
+        });
     }
 } 

@@ -9,6 +9,7 @@ import com.myCar.service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,11 +28,15 @@ public class ReviewController {
     }
 
     @PostMapping
-    public ResponseEntity<?> addReview(@RequestBody ReviewDTO reviewDTO) {
+    public ResponseEntity<?> addReview(@RequestBody ReviewDTO reviewDTO, Authentication authentication) {
         try {
-            System.out.println("Received review data: " + reviewDTO);
-            
-            // Validations existantes
+            // Logs de débogage
+            System.out.println("Tentative d'ajout d'une review");
+            System.out.println("Authentication: " + authentication);
+            System.out.println("Authorities: " + authentication.getAuthorities());
+            System.out.println("Review DTO: " + reviewDTO);
+
+            // Validation
             if (reviewDTO.getCarId() == null) {
                 return ResponseEntity
                     .badRequest()
@@ -59,6 +64,7 @@ public class ReviewController {
             Review review = reviewService.addReview(reviewDTO);
             return ResponseEntity.ok(review);
         } catch (Exception e) {
+            System.out.println("Erreur lors de l'ajout de la review: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)

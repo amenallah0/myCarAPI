@@ -16,22 +16,34 @@ public class NotificationController {
     @Autowired
     private NotificationService notificationService;
 
-    @PostMapping
-    public ResponseEntity<Void> createNotification(@RequestBody Map<String, String> payload) {
-        String message = payload.get("message"); // Extraire le message du payload
-        notificationService.createNotification(message);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
-
     @GetMapping
     public ResponseEntity<List<Notification>> getAllNotifications() {
-        List<Notification> notifications = notificationService.getAllNotifications();
-        return ResponseEntity.ok(notifications);
+        try {
+            List<Notification> notifications = notificationService.getAllNotifications();
+            return ResponseEntity.ok(notifications);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping
+    public ResponseEntity<Void> createNotification(@RequestBody Map<String, String> payload) {
+        try {
+            String message = payload.get("message");
+            notificationService.createNotification(message);
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteNotification(@PathVariable Long id) {
-        notificationService.deleteNotification(id);
-        return ResponseEntity.ok("Notification supprimée.");
+    public ResponseEntity<Void> deleteNotification(@PathVariable Long id) {
+        try {
+            notificationService.deleteNotification(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 } 

@@ -42,6 +42,7 @@ public class User {
     private String address;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "role")
     private Role role;
 
     private LocalDateTime createdAt;
@@ -50,6 +51,18 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("user") // Ignore user reference in cars during serialization
     private List<Car> cars;
+
+    @Column(name = "account_non_expired")
+    private boolean accountNonExpired = true;
+
+    @Column(name = "account_non_locked")
+    private boolean accountNonLocked = true;
+
+    @Column(name = "credentials_non_expired")
+    private boolean credentialsNonExpired = true;
+
+    @Column(name = "enabled")
+    private boolean enabled = true;
 
     public User() {
         // Default constructor
@@ -60,7 +73,7 @@ public class User {
         this.username = username;
         this.email = email;
         setPassword(password);
-        this.role = role != null ? role : Role.USER;
+        this.role = role != null ? role : Role.ROLE_USER;
         this.firstName = firstName;
         this.lastName = lastName;
         this.phone = phone;
@@ -69,7 +82,7 @@ public class User {
 
     // Constructeur minimal
     public User(String username, String email, String password) {
-        this(username, email, password, Role.USER, null, null, null, null);
+        this(username, email, password, Role.ROLE_USER, null, null, null, null);
     }
 
     // Constructeur avec role
@@ -82,7 +95,7 @@ public class User {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
         if (role == null) {
-            role = Role.USER;
+            role = Role.ROLE_USER;
         }
     }
 
@@ -100,4 +113,24 @@ public class User {
             this.password = new BCryptPasswordEncoder().encode(password);
         }
     }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public boolean isAccountNonExpired() { return accountNonExpired; }
+    public void setAccountNonExpired(boolean accountNonExpired) { this.accountNonExpired = accountNonExpired; }
+
+    public boolean isAccountNonLocked() { return accountNonLocked; }
+    public void setAccountNonLocked(boolean accountNonLocked) { this.accountNonLocked = accountNonLocked; }
+
+    public boolean isCredentialsNonExpired() { return credentialsNonExpired; }
+    public void setCredentialsNonExpired(boolean credentialsNonExpired) { this.credentialsNonExpired = credentialsNonExpired; }
+
+    public boolean isEnabled() { return enabled; }
+    public void setEnabled(boolean enabled) { this.enabled = enabled; }
 }
