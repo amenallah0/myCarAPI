@@ -149,13 +149,21 @@ public class UserService implements UserUseCase {
     @Override
     public AuthResponse authenticateUser(String email, String password) {
         try {
+            System.out.println("Tentative de connexion pour : " + email + " avec le mot de passe : " + password);
+            User user = getUserByEmail(email);
+            if (user != null) {
+                System.out.println("Mot de passe hashé en base : " + user.getPassword());
+            } else {
+                System.out.println("Aucun utilisateur trouvé avec cet email.");
+            }
+
             // Authentifier l'utilisateur
             Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(email, password)
             );
             
             // Récupérer l'utilisateur
-            User user = getUserByEmail(email);
+            user = getUserByEmail(email);
             if (user == null) {
                 throw new RuntimeException("Utilisateur non trouvé");
             }
@@ -175,6 +183,7 @@ public class UserService implements UserUseCase {
             return new AuthResponse(tokens, user);
             
         } catch (Exception e) {
+            System.out.println("Erreur d'authentification : " + e.getMessage());
             throw new RuntimeException("Erreur d'authentification: " + e.getMessage());
         }
     }

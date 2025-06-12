@@ -1,23 +1,17 @@
 package com.myCar.repository;
 
-import java.util.List;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-import com.myCar.domain.Car;
+import com.myCar.domain.PasswordResetToken;
 
 @Repository
-public interface CarRepository extends JpaRepository<Car, Long> {
-    Page<Car> findAll(Pageable pageable);
-    List<Car> findByPromotedTrue();
-    List<Car> findByUserId(Long userId);
+public interface PasswordResetTokenRepository extends JpaRepository<PasswordResetToken, Long> {
+    PasswordResetToken findByToken(String token);
+    
     @Modifying
-    @Query("DELETE FROM Car c WHERE c.user.id = :userId")
+    @Query("DELETE FROM PasswordResetToken t WHERE t.user.id = :userId")
     void deleteByUserId(@Param("userId") Long userId);
-}
+} 

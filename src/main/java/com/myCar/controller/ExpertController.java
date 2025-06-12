@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.time.LocalDate;
 import com.myCar.dto.ExpertReportDTO;
 import com.myCar.domain.ExpertReport;
+import com.myCar.service.EmailService;
 
 @RestController
 @RequestMapping("/api/experts")
@@ -22,6 +23,9 @@ public class ExpertController {
     
     @Autowired
     private ExpertService expertService;
+    
+    @Autowired
+    private EmailService emailService;
     
     @PostMapping
     public ResponseEntity<Expert> createExpert(@Valid @RequestBody Expert expert) {
@@ -59,13 +63,23 @@ public class ExpertController {
         return ResponseEntity.ok(experts);
     }
     
-    @PostMapping("/expertise-requests/{requestId}/submit-report")
-    public ResponseEntity<?> submitExpertReport(@PathVariable Long requestId, @ModelAttribute ExpertReportDTO reportDTO) {
-        try {
-            ExpertReport report = expertService.submitReport(requestId, reportDTO);
-            return ResponseEntity.ok(report);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
+    // @PostMapping("/expertise-requests/{requestId}/submit-report")
+    // public ResponseEntity<?> submitExpertReport(
+    //     @PathVariable Long requestId,
+    //     @ModelAttribute ExpertReportDTO reportDTO,
+    //     @RequestParam("recipientEmail") String recipientEmail
+    // ) {
+    //     try {
+    //         ExpertReport report = expertService.submitReport(requestId, reportDTO);
+
+    //         // Utilise l'email saisi dans la pop-up
+    //         String nom = report.getExpertiseRequest().getUser().getFirstName();
+
+    //         emailService.sendExpertiseReportNotification(recipientEmail, nom, report);
+
+    //         return ResponseEntity.ok(report);
+    //     } catch (Exception e) {
+    //         return ResponseEntity.badRequest().body(e.getMessage());
+    //     }
+    // }
 } 

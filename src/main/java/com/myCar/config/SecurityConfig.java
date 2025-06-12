@@ -95,9 +95,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
             .cors().and().csrf().disable()
             .authorizeRequests()
+                .antMatchers(HttpMethod.POST, "/api/contact").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/users/refresh-token").permitAll()
                 .antMatchers("/api/users/signin", "/api/users/signup").permitAll()
                 .antMatchers("/api/users/expert/signup", "/api/users/admin/signup").permitAll()
+                .antMatchers("/api/password/**").permitAll()
                 .antMatchers("/api/cars", "/api/cars/**").permitAll()
                 .antMatchers("/api/files/**", "/images/**", "/assets/**", "/static/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/annonces", "/api/reviews/car/**").permitAll()

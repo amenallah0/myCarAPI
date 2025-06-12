@@ -54,14 +54,14 @@ public class FileUploadService {
         Path filePath = uploadPath.resolve(uniqueFilename);
         try {
             Files.copy(file.getInputStream(), filePath);
-            notifyFlaskToProcessImage(filePath.toString());
+            processImageWithFlask(filePath.toString());
         } catch (IOException e) {
             throw new RuntimeException("Failed to store file " + originalFilename, e);
         }
         return uniqueFilename;
     }
 
-    private void notifyFlaskToProcessImage(String imagePath) {
+    private void processImageWithFlask(String imagePath) {
         try {
             MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
             body.add("file_path", imagePath);
@@ -74,12 +74,11 @@ public class FileUploadService {
             if (responseEntity.getStatusCode() == HttpStatus.OK) {
                 System.out.println("Flask API Response: " + responseEntity.getBody());
             } else {
-                System.err.println("Failed : HTTP error code : " + responseEntity.getStatusCodeValue());
-                throw new RuntimeException("Failed : HTTP error code : " + responseEntity.getStatusCodeValue());
+                System.out.println("No license plate detected in image: " + imagePath);
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Error communicating with Flask API", e);
+            System.out.println("Warning: Could not process image with Flask API: " + imagePath);
+            System.out.println("Reason: " + e.getMessage());
         }
     }
 

@@ -5,6 +5,7 @@ import com.myCar.domain.ExpertiseRequest;
 import com.myCar.dto.ExpertReportDTO;
 import com.myCar.service.ExpertiseRequestService;
 import com.myCar.service.ExpertService;
+import com.myCar.service.EmailService;
 import com.myCar.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,9 @@ public class ExpertiseRequestController {
 
     @Autowired
     private ExpertService expertService;
+
+    @Autowired
+    private EmailService emailService;
 
     @PostMapping
     public ResponseEntity<ExpertiseRequest> createRequest(@RequestBody CreateExpertiseRequestDTO requestDTO) {
@@ -102,13 +106,19 @@ public class ExpertiseRequestController {
                 produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> submitExpertReport(
             @PathVariable Long requestId,
-            @ModelAttribute ExpertReportDTO reportDTO) {
+            @ModelAttribute ExpertReportDTO reportDTO,
+            @RequestParam("recipientEmail") String recipientEmail) {
         try {
             if (reportDTO.getExpertiseDate() == null) {
                 reportDTO.setExpertiseDate(LocalDate.now());
             }
             
             ExpertReport report = expertService.submitReport(requestId, reportDTO);
+
+            // Envoi de l'email
+            String nom = report.getExpertiseRequest().getUser().getFirstName();
+            emailService.sendExpertiseReportNotification(recipientEmail, nom, report);
+
             return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(report);

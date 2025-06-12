@@ -79,7 +79,10 @@ public class Car {
 
     @Column(nullable = false)
     private boolean available = true;
-
+    
+    @Column(nullable = false)
+    private boolean validated = false;
+    
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
