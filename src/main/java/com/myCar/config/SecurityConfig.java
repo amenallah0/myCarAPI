@@ -201,10 +201,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
-    @Bean
-    public ObjectMapper objectMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-        return mapper;
-    }
+    // @Bean
+    // public ObjectMapper objectMapper() {
+    //     ObjectMapper mapper = new ObjectMapper();
+    //     mapper.registerModule(new JavaTimeModule());
+    //     return mapper;
+    // }
 }
