@@ -23,7 +23,7 @@ logs/
 
 # Ignore dependency directories
 # For Maven:
-/.mvn/
+
 # For Gradle:
 /.gradle/
 
