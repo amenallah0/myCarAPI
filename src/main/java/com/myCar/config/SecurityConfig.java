@@ -75,6 +75,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // In production, consider using more restrictive settings.
         config.setAllowCredentials(true);
         config.addAllowedOrigin("http://localhost:3000"); // Update with your React app URL
+        config.addAllowedOrigin("https://mycarsell.vercel.app/"); // Update with your React app URL
         config.addAllowedHeader("*");
         config.addAllowedMethod(HttpMethod.GET);
         config.addAllowedMethod(HttpMethod.POST);
