@@ -89,6 +89,8 @@ public class UserService implements UserUseCase {
 
     @Override
     public User saveUser(User user) {
+        // Hash the password before saving
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 
