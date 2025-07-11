@@ -75,7 +75,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // In production, consider using more restrictive settings.
         config.setAllowCredentials(true);
         config.addAllowedOrigin("http://localhost:3000"); // Update with your React app URL
-        config.addAllowedOrigin("https://mycarsell.vercel.app/"); // Update with your React app URL
+        config.addAllowedOrigin("https://my-car-main.vercel.app"); // Update with your React app URL
         config.addAllowedHeader("*");
         config.addAllowedMethod(HttpMethod.GET);
         config.addAllowedMethod(HttpMethod.POST);
@@ -187,7 +187,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
-        configuration.setAllowedOrigins(Arrays.asList("https://mycarsell.vercel.app/")); // Remplacez par l'URL de votre frontend
+        configuration.setAllowedOrigins(Arrays.asList("https://my-car-main.vercel.app")); // Remplacez par l'URL de votre frontend
         // Remplacez par l'URL de votre frontend
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
