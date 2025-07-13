@@ -33,6 +33,7 @@ public class AdminInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        logger.info("🚀 AdminInitializer starting...");
         createAdminUser();
     }
 
