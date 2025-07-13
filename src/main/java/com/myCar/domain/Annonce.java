@@ -15,7 +15,8 @@ public class Annonce {
 
     @NotBlank(message = "La description est obligatoire")
     private String description;
-
+    
+    @Column(columnDefinition = "LONGTEXT")
     private String image;
 
     private LocalDateTime dateDebut;
