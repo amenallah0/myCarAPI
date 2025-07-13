@@ -108,6 +108,10 @@ public class User {
         this.password = password;
     }
 
+    public String getPassword() {
+        return this.password;
+    }
+
     public void updatePassword(String password) {
         if (password != null) {
             this.password = new BCryptPasswordEncoder().encode(password);
