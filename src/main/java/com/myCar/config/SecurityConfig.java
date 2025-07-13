@@ -31,18 +31,57 @@ import com.myCar.security.JwtTokenProvider;
 import com.myCar.security.CustomUserDetailsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.myCar.domain.Role;
+import com.myCar.service.UserService;
+import javax.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+    private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
+
     private final JwtTokenProvider tokenProvider;
     private final CustomUserDetailsService customUserDetailsService;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     public SecurityConfig(JwtTokenProvider tokenProvider, CustomUserDetailsService customUserDetailsService) {
         this.tokenProvider = tokenProvider;
         this.customUserDetailsService = customUserDetailsService;
+    }
+
+    @PostConstruct
+    public void initializeAdmin() {
+        try {
+            logger.info("🚀 Initializing admin user...");
+            
+            // Vérifier si l'admin existe déjà
+            User existingAdmin = userService.getUserByEmail("admin@mycar.com");
+            if (existingAdmin != null) {
+                logger.info("✅ Admin user already exists");
+                return;
+            }
+
+            // Créer l'admin avec le constructeur complet
+            User admin = new User("admin", "admin@mycar.com", 
+                                passwordEncoder().encode("admin123"), 
+                                Role.ROLE_ADMIN, 
+                                "Administrator", 
+                                "System", 
+                                null, 
+                                null);
+
+            userService.saveUser(admin);
+            logger.info("🎉 Admin user created successfully!");
+            
+        } catch (Exception e) {
+            logger.error("❌ Error creating admin user: {}", e.getMessage(), e);
+        }
     }
 
     public class AuthResponse {
