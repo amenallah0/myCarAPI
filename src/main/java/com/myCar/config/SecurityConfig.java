@@ -37,6 +37,8 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 
 @Configuration
 @EnableWebSecurity
@@ -60,7 +62,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         this.customUserDetailsService = customUserDetailsService;
     }
 
-    @PostConstruct
+    @EventListener(ApplicationReadyEvent.class)
     public void initializeAdmin() {
         try {
             logger.info("🚀 Initializing admin user...");
