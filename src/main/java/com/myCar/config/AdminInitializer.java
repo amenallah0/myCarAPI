@@ -43,7 +43,19 @@ public class AdminInitializer implements CommandLineRunner {
             User existingAdmin = userService.getUserByEmail(ADMIN_EMAIL);
             if (existingAdmin != null) {
                 logger.info("✅ Admin user already exists: {}", ADMIN_EMAIL);
-                return;
+                
+                // Vérifier si le mot de passe est correct
+                if (passwordEncoder.matches(ADMIN_PASSWORD, existingAdmin.getPassword())) {
+                    logger.info("✅ Admin password is correct");
+                    return;
+                } else {
+                    logger.warn("⚠️ Admin password hash is incorrect, updating...");
+                    // Mettre à jour le mot de passe (en clair, sera crypté dans saveUser())
+                    existingAdmin.setPassword(ADMIN_PASSWORD);
+                    userService.saveUser(existingAdmin);
+                    logger.info("🔄 Admin password updated successfully!");
+                    return;
+                }
             }
 
             // Vérifier aussi par nom d'utilisateur
@@ -53,8 +65,8 @@ public class AdminInitializer implements CommandLineRunner {
                 return;
             }
 
-            // Créer le compte admin
-            User admin = new User(ADMIN_USERNAME, ADMIN_EMAIL, passwordEncoder.encode(ADMIN_PASSWORD), 
+            // Créer le compte admin (mot de passe en clair, sera crypté dans saveUser())
+            User admin = new User(ADMIN_USERNAME, ADMIN_EMAIL, ADMIN_PASSWORD, 
                                   Role.ROLE_ADMIN, ADMIN_FIRSTNAME, ADMIN_LASTNAME, null, null);
             admin.setEnabled(true);
             admin.setAccountNonExpired(true);
