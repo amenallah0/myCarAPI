@@ -36,6 +36,7 @@ import com.myCar.service.UserService;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 
 @Configuration
 @EnableWebSecurity
@@ -48,6 +49,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    @Lazy
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     public SecurityConfig(JwtTokenProvider tokenProvider, CustomUserDetailsService customUserDetailsService) {
@@ -69,7 +74,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
             // Créer l'admin avec le constructeur complet
             User admin = new User("admin", "admin@mycar.com", 
-                                passwordEncoder().encode("admin123"), 
+                                passwordEncoder.encode("admin123"), 
                                 Role.ROLE_ADMIN, 
                                 "Administrator", 
                                 "System", 
